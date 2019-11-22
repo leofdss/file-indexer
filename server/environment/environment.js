@@ -1,6 +1,6 @@
 module.exports = {
     production: false,
-    directory: '../../files',
+    directory: './files',
     database: 'mongodb://localhost:27017/tizza',
     config: {
         useNewUrlParser: true,
