@@ -9,6 +9,14 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+const indexer = require('./lib/indexer').indexer;
+const deindexer = require('./lib/indexer').deindexer;
+
+setInterval(()=>{
+  indexer();
+  deindexer();
+}, 1000 * 5);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
