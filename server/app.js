@@ -7,8 +7,17 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var databaseRouter = require('./routes/database');
+var downloadRouter = require('./routes/download');
 
 var app = express();
+var cors = require('cors');
+
+//create a cors middleware
+let corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 const indexer = require('./lib/indexer').indexer;
 const deindexer = require('./lib/indexer').deindexer;
@@ -16,7 +25,7 @@ const deindexer = require('./lib/indexer').deindexer;
 setInterval(() => {
   indexer();
   deindexer();
-}, 1000 * 5);
+}, 1000 * 50);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +39,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.user('/database', databaseRouter);
+app.use('/database', databaseRouter);
+app.use('/download', downloadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

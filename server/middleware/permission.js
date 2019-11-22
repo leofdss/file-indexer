@@ -6,6 +6,8 @@ const permission = (array) => {
             console.log('permission: ', array);
             if (req.headers.authorization === '123') {
                 next();
+            } else {
+                res.status(401).send({ error: 'required authorization' });
             }
         }
     }
