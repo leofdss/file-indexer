@@ -51,16 +51,17 @@ router.get('/', function (req, res) {
 
     query = convertQuery(query);
 
-    database.find(query).sort(sort).limit(limit).skip(skip).toArray((error, result) => {
-        if (error) {
-            res.status(500).send(result);
-        } else {
-            for (const item of result) {
-                if (!fs.existsSync(genetatePath(item.path.concat([item.name])))) {
-                    remove(item._id);
-                }
+    database.find(query).sort(sort).limit(limit).skip(skip).toArray((error, results) => {
+        database.countDocuments(query, (error2, n) => {
+            if (error) {
+                res.status(500).send({ error });
+            } else {
+                res.status(200).send({
+                    total_count: n,
+                    items: results
+                });
             }
-        }
+        });
     });
 });
 

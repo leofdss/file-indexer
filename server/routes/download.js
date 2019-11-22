@@ -6,7 +6,7 @@ const generateFileUrl = require('../lib/url').generateFileUrl;
 const zipFolder = require('zip-folder');
 const rm = require('../lib/rm');
 
-var keys = [];
+const keys = [];
 
 router.post('/', permission(['Download']), async function async(req, res) {
   try {

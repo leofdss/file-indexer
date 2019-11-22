@@ -1,35 +1,51 @@
-<mat-form-field class="example-full-width">
-  <input matInput placeholder="Procurar">
+<mat-form-field class="full-width">
+  <input matInput placeholder="Procurar" [formControl]="searchField">
 </mat-form-field>
 
-<div class="mat-elevation-z8">
-  <table mat-table class="full-width-table" matSort aria-label="Elements">
-    <!-- Id Column -->
-    <ng-container matColumnDef="id" sticky>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>OS</th>
-      <td mat-cell *matCellDef="let row">{{row.id}}</td>
-    </ng-container>
+<mat-card>
+  <div class="example-loading-shade" *ngIf="isLoadingResults">
+    <mat-spinner></mat-spinner>
+  </div>
+  <div class="container-row">
+    <table mat-table [dataSource]="data" matSort matSortActive="created" matSortDisableClear matSortDirection="desc">
+      <ng-container matColumnDef="select" sticky>
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
 
-    <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Cliente</th>
-      <td mat-cell *matCellDef="let row">{{row.name}}</td>
-    </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> nome </th>
+        <td mat-cell *matCellDef="let row"> {{row?.name}} </td>
+      </ng-container>
 
-    <ng-container matColumnDef="files" stickyEnd>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Arquivos</th>
-      <td mat-cell *matCellDef="let row">
-        <button mat-icon-button (click)="openDialog(row.id)">
-          <mat-icon> folder </mat-icon>
-        </button>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="path">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Caminho </th>
+        <td mat-cell *matCellDef="let row"> /{{row?.path.join('/')}} </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <ng-container matColumnDef="files" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button (click)="download(row)">
+            <mat-icon> cloud_download </mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-  <mat-paginator #paginator [length]="dataSource?.data.length" [pageIndex]="0" [pageSize]="50"
-    [pageSizeOptions]="[25, 50, 100, 250]">
-  </mat-paginator>
-</div>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+      </tr>
+    </table>
+  </div>
+
+  <mat-paginator [length]="resultsLength" [pageSize]="30" [pageSizeOptions]="[30, 50, 100, 200]"></mat-paginator>
+</mat-card>
