@@ -62,6 +62,10 @@ function deindexer() {
     }
 }
 
+/** 
+ * path => string[] 
+ * name => string
+ * */
 function add(path, name) {
     try {
         database.findOne({ path, name }, (error, result) => {
@@ -80,6 +84,7 @@ function add(path, name) {
     }
 }
 
+/** _id => ObjectID */
 function remove(_id) {
     try {
         database.deleteOne({ _id }, (error, result) => {
