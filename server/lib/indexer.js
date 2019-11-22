@@ -3,6 +3,8 @@ const pathConverter = require('path');
 const directory = require('../environment/environment').directory;
 const initMongo = require('./mongodb').init;
 
+let database;
+
 initMongo((error, client) => {
     if (error)
         console.log(error)
@@ -12,36 +14,81 @@ initMongo((error, client) => {
     }
 });
 
-/** path => string[] */
+/** path => string[] return string */
 function genetatePath(path) {
-    let resp = [];
+    if (!path) path = [];
     try {
-        const temp = pathConverter.join(fs.realpathSync(directory + '/' + path.join('/')));
-        resp = temp.split('/');
+        return pathConverter.join(directory + '/' + path.join('/'));
     } catch (error) {
-        return [];
+        console.log(error);
+        return '';
     }
-    if (resp)
-        return resp;
-    return resp;
 }
 
-function indexer() {
-
-
+/** path => string[] */
+function indexer(path) {
+    if (!path) path = [];
+    console.log('path', genetatePath(path));
+    try {
+        const files = fs.readdirSync(genetatePath(path));
+        for (const file of files) {
+            const stat = fs.statSync(genetatePath(path.concat([file])));
+            if (stat.isDirectory()) {
+                indexer(path.concat([file]));
+            } else {
+                add(path, file);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 function deindexer() {
-
+    try {
+        database.find().toArray((error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                for (const item of result) {
+                    if (!fs.existsSync(genetatePath(item.path.concat([item.name])))) {
+                        remove(item._id);
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
-function add() {
-
+function add(path, name) {
+    try {
+        database.findOne({ path, name }, (error, result) => {
+            if (error) {
+                console.log(error);
+            } else {
+                if (!result) {
+                    database.insertOne({ name, path }, (error, result) => {
+                        if (error) console.log(error);
+                    });
+                }
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
-function remove() {
-
+function remove(_id) {
+    try {
+        database.deleteOne({ _id }, (error, result) => {
+            if (error) console.log(error);
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 
-module.exports = { indexer }
+module.exports = { indexer, deindexer }
