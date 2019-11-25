@@ -29,7 +29,11 @@
 
       <ng-container matColumnDef="path">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Caminho </th>
-        <td mat-cell *matCellDef="let row"> /{{row?.path.join('/')}} </td>
+        <td mat-cell *matCellDef="let row">
+          <a class="path" *ngFor="let item of row?.path; index as i" (click)="openDialog(row?.path, i)">
+            /{{item}}
+          </a>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="files" stickyEnd>
