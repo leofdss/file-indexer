@@ -60,7 +60,7 @@ export class TreeComponent implements OnInit {
     return {
       name: node.name,
       type: node.type,
-      level: level,
+      level,
       expandable: !!node.children
     };
   }

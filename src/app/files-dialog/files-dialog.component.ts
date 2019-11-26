@@ -55,7 +55,7 @@ export class FilesDialogComponent implements OnInit {
 
     this.fileService.listFiles(query).subscribe((data) => {
       console.log(data);
-      let nivel = this.data.nivel;
+      const nivel = this.data.nivel;
       for (const file of data.items) {
         this.addFile(file, nivel, files);
       }
