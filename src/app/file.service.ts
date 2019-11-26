@@ -18,7 +18,15 @@ export class FileService {
     private http: HttpClient,
   ) { }
 
-  listOS(options: { query: object, sort: string, order: string, page: number, limit: number, search?: string }): Observable<Result> {
+  listFilesTable(
+    options: {
+      query: object,
+      sort: string,
+      order: string,
+      page: number,
+      limit: number,
+      search?: string
+    }): Observable<Result> {
     const href = environment.dataserver + '/database';
 
     let requestUrl = `${href}?sort=${options.sort}&order=${options.order}&page=${options.page}&limit=${options.limit}`;
@@ -31,6 +39,18 @@ export class FileService {
       headers: new HttpHeaders({
         Authorization: '123',
         query: JSON.stringify(options.query)
+      })
+    });
+  }
+
+  listFiles(query: object): Observable<Result> {
+    console.log(query);
+    const href = environment.dataserver + '/database';
+
+    return this.http.get<Result>(href, {
+      headers: new HttpHeaders({
+        Authorization: '123',
+        query: JSON.stringify(query)
       })
     });
   }

@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as observableOf } from 'rxjs';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { files } from './example-data';
+import { FileService } from '../file.service';
+import { environment } from 'src/environments/environment';
 
 /** File node data with possible child nodes. */
 export interface FileNode {
   name: string;
   type: string;
+  path: string[];
   children?: FileNode[];
 }
 
@@ -27,7 +29,7 @@ export interface FlatTreeNode {
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss']
 })
-export class TreeComponent {
+export class TreeComponent implements OnInit {
 
   /** The TreeControl controls the expand/collapse state of tree nodes.  */
   treeControl: FlatTreeControl<FlatTreeNode>;
@@ -38,7 +40,9 @@ export class TreeComponent {
   /** The MatTreeFlatDataSource connects the control and flattener to provide data. */
   dataSource: MatTreeFlatDataSource<FileNode, FlatTreeNode>;
 
-  constructor() {
+  @Input() files;
+
+  constructor(private fileService: FileService) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
       this.getLevel,
@@ -47,7 +51,11 @@ export class TreeComponent {
 
     this.treeControl = new FlatTreeControl(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-    this.dataSource.data = files;
+  }
+
+  ngOnInit() {
+    console.log(this.files);
+    this.dataSource.data = this.files;
   }
 
   /** Transform the data to something the tree can read. */
@@ -55,7 +63,8 @@ export class TreeComponent {
     return {
       name: node.name,
       type: node.type,
-      level: level,
+      path: node.path,
+      level,
       expandable: !!node.children
     };
   }
@@ -78,5 +87,19 @@ export class TreeComponent {
   /** Get the children for the node. */
   getChildren(node: FileNode) {
     return observableOf(node.children);
+  }
+
+  download(node: FileNode) {
+    const path = '/' + node.path.join('/') + '/' + node.name;
+    this.fileService.download(path).subscribe((data: any) => {
+      const url = environment.dataserver + '/download/' + data.key;
+
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = node.name;
+      document.body.appendChild(a);
+      a.click();
+    }, () => { });
   }
 }

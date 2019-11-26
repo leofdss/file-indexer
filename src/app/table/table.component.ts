@@ -22,7 +22,7 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['select', 'name', 'path', 'files'];
+  displayedColumns = ['name', 'path', 'files'];
   sub: Subscription = new Subscription();
 
   listEmitter: EventEmitter<any> = new EventEmitter();
@@ -71,7 +71,7 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
           if (this.searchField.value) {
             search = this.searchField.value.trim().toLowerCase();
           }
-          return this.fileService.listOS({
+          return this.fileService.listFilesTable({
             query: this.query,
             sort: this.sort.active,
             order: this.sort.direction,
@@ -113,10 +113,18 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
       this.data.forEach(row => this.selection.select(row));
   }
 
-  openDialog(name): void {
+  openDialog(path: string, id: number): void {
+    const newPath = [];
+    for (let i = 0; i <= id; i++) {
+      newPath.push(path[i]);
+    }
     const dialogRef = this.dialog.open(FilesDialogComponent, {
       minWidth: '250px',
-      data: { name }
+      data: {
+        name: path[id],
+        path: newPath,
+        nivel: id
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -130,7 +138,6 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
     this.fileService.download(path).subscribe((data: any) => {
       this.loading = false;
       const url = environment.dataserver + '/download/' + data.key;
-      console.log(url);
 
       const a = document.createElement('a');
       a.style.display = 'none';
