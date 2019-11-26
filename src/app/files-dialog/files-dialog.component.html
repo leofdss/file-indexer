@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>{{data.name}}</h1>
 <div mat-dialog-content>
-    <app-tree></app-tree>
+    <app-tree [files]="files" *ngIf="files"></app-tree>
 </div>
 <div mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
 </div>

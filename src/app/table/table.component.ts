@@ -22,7 +22,7 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['select', 'name', 'path', 'files'];
+  displayedColumns = ['name', 'path', 'files'];
   sub: Subscription = new Subscription();
 
   listEmitter: EventEmitter<any> = new EventEmitter();
@@ -122,7 +122,8 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
       minWidth: '250px',
       data: {
         name: path[id],
-        path: newPath
+        path: newPath,
+        nivel: id
       }
     });
 

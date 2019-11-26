@@ -2,11 +2,17 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FileService } from '../file.service';
 import { FileItem } from '../model/file';
-import { v4 } from 'uuid';
 
-export interface DialogData {
+interface DialogData {
   path: string[];
   name: string;
+  nivel: number;
+}
+
+interface No {
+  name: string;
+  type: string;
+  children?: No[];
 }
 
 @Component({
@@ -21,6 +27,8 @@ export class FilesDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private fileService: FileService
   ) { }
+
+  files: No[];
 
   ngOnInit() {
     this.listFiles();
@@ -39,14 +47,46 @@ export class FilesDialogComponent implements OnInit {
       query.$and.push({ path: item });
     }
 
-    const map = new Map<string, any>();
+    const files = {
+      name: 'files',
+      type: 'folder',
+      children: []
+    };
 
     this.fileService.listFiles(query).subscribe((data) => {
       console.log(data);
-      for (let i = 0; i < data.items.length; i++) {
-        map.set(v4(), { name: data.items[i], parent: data.items[i - 1] });
+      let nivel = this.data.nivel;
+      for (const file of data.items) {
+        this.addFile(file, nivel, files);
       }
+      this.files = files.children;
+      console.log(this.files);
     });
+  }
+
+  addFile(fileItem: FileItem, nivel: number, no: No) {
+    if (nivel === fileItem.path.length) {
+      const file = {
+        name: fileItem.name,
+        type: 'file'
+      };
+      no.children.push(file);
+    } else {
+      const id = no.children.findIndex(obj => obj.name === fileItem.path[nivel]);
+      if (id === -1) {
+        const folder = {
+          name: fileItem.path[nivel],
+          type: 'folder',
+          children: []
+        };
+        nivel++;
+        no.children.push(folder);
+        this.addFile(fileItem, nivel, no.children[no.children.length - 1]);
+      } else {
+        nivel++;
+        this.addFile(fileItem, nivel, no.children[id]);
+      }
+    }
   }
 
 }
