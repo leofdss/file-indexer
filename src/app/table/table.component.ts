@@ -138,7 +138,6 @@ export class TableComponent implements AfterViewInit, OnDestroy, OnInit {
     this.fileService.download(path).subscribe((data: any) => {
       this.loading = false;
       const url = environment.dataserver + '/download/' + data.key;
-      console.log(url);
 
       const a = document.createElement('a');
       a.style.display = 'none';

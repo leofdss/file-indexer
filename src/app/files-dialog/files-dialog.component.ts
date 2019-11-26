@@ -12,6 +12,7 @@ interface DialogData {
 interface No {
   name: string;
   type: string;
+  path?: string[];
   children?: No[];
 }
 
@@ -54,13 +55,11 @@ export class FilesDialogComponent implements OnInit {
     };
 
     this.fileService.listFiles(query).subscribe((data) => {
-      console.log(data);
-      const nivel = this.data.nivel;
+      const nivel = this.data.nivel + 1;
       for (const file of data.items) {
         this.addFile(file, nivel, files);
       }
       this.files = files.children;
-      console.log(this.files);
     });
   }
 
@@ -68,7 +67,8 @@ export class FilesDialogComponent implements OnInit {
     if (nivel === fileItem.path.length) {
       const file = {
         name: fileItem.name,
-        type: 'file'
+        type: 'file',
+        path: fileItem.path
       };
       no.children.push(file);
     } else {

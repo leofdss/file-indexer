@@ -2,11 +2,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as observableOf } from 'rxjs';
 import { FlatTreeControl } from '@angular/cdk/tree';
+import { FileService } from '../file.service';
+import { environment } from 'src/environments/environment';
 
 /** File node data with possible child nodes. */
 export interface FileNode {
   name: string;
   type: string;
+  path: string[];
   children?: FileNode[];
 }
 
@@ -39,7 +42,7 @@ export class TreeComponent implements OnInit {
 
   @Input() files;
 
-  constructor() {
+  constructor(private fileService: FileService) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
       this.getLevel,
@@ -60,6 +63,7 @@ export class TreeComponent implements OnInit {
     return {
       name: node.name,
       type: node.type,
+      path: node.path,
       level,
       expandable: !!node.children
     };
@@ -83,5 +87,19 @@ export class TreeComponent implements OnInit {
   /** Get the children for the node. */
   getChildren(node: FileNode) {
     return observableOf(node.children);
+  }
+
+  download(node: FileNode) {
+    const path = '/' + node.path.join('/') + '/' + node.name;
+    this.fileService.download(path).subscribe((data: any) => {
+      const url = environment.dataserver + '/download/' + data.key;
+
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = node.name;
+      document.body.appendChild(a);
+      a.click();
+    }, () => { });
   }
 }
