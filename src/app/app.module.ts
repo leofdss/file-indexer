@@ -26,6 +26,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     HttpClientModule,
-    MatTooltipModule
+    MatTooltipModule,
+    FlexLayoutModule
   ],
   providers: [],
   bootstrap: [AppComponent],

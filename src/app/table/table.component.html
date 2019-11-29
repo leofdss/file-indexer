@@ -1,55 +1,43 @@
-<mat-form-field class="full-width">
-  <input matInput placeholder="Procurar" [formControl]="searchField">
-</mat-form-field>
-
-<mat-card>
-  <div class="example-loading-shade" *ngIf="isLoadingResults">
-    <mat-spinner></mat-spinner>
+<div fxLayout="column" fxLayoutGap="10px">
+  <div class="full-width" fxLayout="row" fxLayoutGap="10px">
+    <div class="full-width" fxLayoutAlign="start center" fxLayoutAlign.lt-sm="center center">
+      <input class="buscar" type="text" name="Procurar" placeholder="Procurar.." [formControl]="searchField">
+    </div>
   </div>
-  <div class="container-row">
-    <table mat-table [dataSource]="data" matSort matSortActive="created" matSortDisableClear matSortDirection="desc">
-      <ng-container matColumnDef="select" sticky>
-        <th mat-header-cell *matHeaderCellDef>
-          <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()">
-          </mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let row">
-          <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-          </mat-checkbox>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> nome </th>
-        <td mat-cell *matCellDef="let row"> {{row?.name}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="path">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Caminho </th>
-        <td mat-cell *matCellDef="let row">
-          <a class="path" *ngFor="let item of row?.path; index as i" (click)="openDialog(row?.path, i)">
-            /{{item}}
-          </a>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="files" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef> </th>
-        <td mat-cell *matCellDef="let row">
-          <button mat-icon-button (click)="download(row)" matTooltip="Download">
-            <mat-icon> cloud_download </mat-icon>
-          </button>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;">
-      </tr>
-    </table>
-  </div>
-
-  <mat-paginator [length]="resultsLength" [pageSize]="30" [pageSizeOptions]="[30, 50, 100, 200]"></mat-paginator>
-</mat-card>
+  
+  <mat-card>
+    <div class="loading-shade" *ngIf="isLoadingResults">
+      <mat-spinner></mat-spinner>
+    </div>
+    <div class="table-container">
+      <table matSort>
+        <thead>
+          <tr>
+            <th mat-sort-header="name">Nome</th>
+            <th mat-sort-header="path">Caminho</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of data; index as i">
+            <td>{{row?.name}}</td>
+            <td>
+              <a class="path" *ngFor="let item of row?.path; index as j" (click)="openDialog(row?.path, j)">
+                /{{item}}
+              </a>
+            </td>
+            <td>
+              <div fxLayoutAlign="end">
+                <button mat-icon-button (click)="download(row)" matTooltip="Download">
+                  <mat-icon> cloud_download </mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <mat-paginator [length]="resultsLength" [pageSize]="30" [pageSizeOptions]="[30,50,100,200,500]">
+      </mat-paginator>
+    </div>
+  </mat-card>
+</div>
